@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Edit Employee | Employee Payroll</title>
+  <style>
+    :root {
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      color-scheme: light;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: #edf2f7;
+      color: #111827;
+    }
+
+    .page-shell {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px 20px 40px;
+    }
+
+    .brand-bar {
+      width: 100%;
+      max-width: 760px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .brand-bar .brand {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 640px;
+      background: #ffffff;
+      padding: 32px;
+      border-radius: 18px;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.07);
+    }
+
+    .card h1 {
+      margin: 0 0 10px;
+      font-size: 26px;
+      color: #111827;
+    }
+
+    .card p {
+      margin: 0 0 24px;
+      color: #6b7280;
+      line-height: 1.7;
+    }
+
+    .field-row {
+      display: grid;
+      gap: 10px;
+      padding: 18px 0;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .field-row:last-of-type {
+      border-bottom: none;
+    }
+
+    label {
+      font-size: 14px;
+      font-weight: 600;
+      color: #111827;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="date"],
+    select {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 12px;
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      font-size: 15px;
+      color: #111827;
+    }
+
+    .radio-group {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+    }
+
+    .radio-group label {
+      font-weight: 500;
+      color: #374151;
+    }
+
+    .button-row {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-top: 26px;
+    }
+
+    .primary-button,
+    .secondary-button {
+      min-height: 50px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      text-decoration: none;
+      border: none;
+    }
+
+    .primary-button {
+      flex: 1 1 220px;
+      background: #2563eb;
+      color: white;
+    }
+
+    .primary-button:hover {
+      background: #1d4ed8;
+    }
+
+    .secondary-button {
+      flex: 1 1 220px;
+      background: transparent;
+      color: #2563eb;
+      border: 1.5px solid #cbd5e1;
+    }
+
+    .secondary-button:hover {
+      background: #f8fafc;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+    <header class="brand-bar">
+      <div class="brand">Employee Payroll</div>
+    </header>
+
+    <section class="card">
+      <h1>Edit Employee</h1>
+      <p>Update the employee record with clean input controls and a polished form layout.</p>
+
+      <form method="POST" action="/employees/<%= emp.id %>?_method=PUT">
+        <div class="field-row">
+          <label for="name">Name</label>
+          <input id="name" type="text" name="name" value="<%= emp.name %>" required>
+        </div>
+
+        <div class="field-row">
+          <label for="gender">Gender</label>
+          <select id="gender" name="gender">
+            <option value="Male" <%= emp.gender === "Male" ? "selected" : "" %>>Male</option>
+            <option value="Female" <%= emp.gender === "Female" ? "selected" : "" %>>Female</option>
+          </select>
+        </div>
+
+        <div class="field-row">
+          <label for="photoUrl">Photo URL</label>
+          <input id="photoUrl" type="text" name="photoUrl" value="<%= emp.photo_url %>" placeholder="https://example.com/photo.jpg">
+        </div>
+
+        <div class="field-row">
+          <label for="department">Department</label>
+          <input id="department" type="text" name="department" value="<%= emp.dept %>" required>
+        </div>
+
+        <div class="field-row">
+          <label for="email">Employee Email</label>
+          <input id="email" type="email" name="email" value="<%= emp.email %>" placeholder="employee@gmail.com">
+        </div>
+
+        <div class="field-row">
+          <label for="phone">Phone</label>
+          <input id="phone" type="tel" name="phone" value="<%= emp.phone %>" placeholder="e.g. +911234567890">
+        </div>
+
+        <div class="field-row">
+          <label for="basicSalary">Salary</label>
+          <input id="basicSalary" type="number" name="basicSalary" value="<%= emp.basic_sal %>" required>
+        </div>
+
+        <div class="field-row">
+          <label for="joiningDate">Joining Date</label>
+          <input id="joiningDate" type="date" name="joiningDate" value="<%= emp.date %>" required>
+        </div>
+
+        <div class="button-row">
+          <button type="submit" class="primary-button">Save Changes</button>
+          <a href="/employees" class="secondary-button">Cancel</a>
+        </div>
+      </form>
+    </section>
+  </div>
+</body>
+</html>

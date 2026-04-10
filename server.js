@@ -1,0 +1,27 @@
+import express from "express";
+import dotenv from "dotenv";
+import connection from "./config/db.js";
+import logger from "./Middleware/Logging.js";
+import employeeRoutes from "./Routing/routes.js";
+
+dotenv.config();
+
+const app = express();
+
+connection();
+
+app.set("view engine", "ejs");
+app.use(express.urlencoded({ extended: true }));
+import methodOverride from "method-override";
+app.use(methodOverride("_method"));
+
+app.use(express.json());
+app.use(logger);
+
+app.use("/employees", employeeRoutes);
+
+app.listen(process.env.PORT || 3000, () => {
+  console.log(`Server running on port ${process.env.PORT || 3000}`);
+});
+
+export default app;

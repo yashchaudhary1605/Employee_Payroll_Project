@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Payroll Slip | Employee Payroll</title>
+  <style>
+    :root {
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      color-scheme: light;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: #eef2f7;
+      color: #111827;
+    }
+
+    .page-shell {
+      min-height: 100vh;
+      padding: 32px 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 680px;
+      background: #ffffff;
+      padding: 34px;
+      border-radius: 24px;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 24px 60px rgba(15, 23, 42, 0.08);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 18px;
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 18px;
+      margin-bottom: 24px;
+    }
+
+    .title-block h1 {
+      margin: 0;
+      font-size: 28px;
+      letter-spacing: 0.02em;
+    }
+
+    .title-block p {
+      margin: 6px 0 0;
+      color: #4b5563;
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    .meta {
+      text-align: right;
+      color: #6b7280;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .meta strong {
+      display: inline-block;
+      min-width: 90px;
+      color: #111827;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin-bottom: 26px;
+    }
+
+    .info-box {
+      background: #f8fafc;
+      padding: 18px 20px;
+      border-radius: 16px;
+      border: 1px solid #e5e7eb;
+    }
+
+    .info-box strong {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 14px;
+      color: #111827;
+    }
+
+    .info-box span {
+      color: #475569;
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    .salary-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 30px;
+    }
+
+    .salary-table th,
+    .salary-table td {
+      padding: 16px 18px;
+      border: 1px solid #e5e7eb;
+      font-size: 15px;
+    }
+
+    .salary-table th {
+      background: #f8fafc;
+      color: #334155;
+      text-align: left;
+      font-weight: 700;
+    }
+
+    .salary-table td {
+      color: #475569;
+    }
+
+    .salary-table .total-row td {
+      background: #f9fafb;
+      font-weight: 700;
+      color: #111827;
+    }
+
+    .footer-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 16px 18px;
+      border-radius: 14px;
+      background: #eff6ff;
+      border: 1px solid #dbeafe;
+      text-decoration: none;
+      color: #2563eb;
+      font-weight: 700;
+      transition: background 0.2s ease;
+    }
+
+    .footer-link:hover {
+      background: #e0f2fe;
+    }
+  </style>
+</head>
+<body>
+  <% const basic = Number(emp.basic_sal); const hra = Math.round(basic * 0.2); const da = Math.round(basic * 0.1); const pf = Math.round(basic * 0.05); const gross = basic + hra + da; %>
+  <div class="page-shell">
+    <div class="card">
+      <div class="card-header">
+        <div class="title-block">
+          <h1>Payroll Slip</h1>
+          <p>Professional, formal salary details generated for the selected employee.</p>
+        </div>
+        <div class="meta">
+          <div><strong>Date:</strong> <%= new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) %></div>
+          <div><strong>ID:</strong> <%= emp.id %></div>
+        </div>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-box">
+          <strong>Employee Name</strong>
+          <span><%= emp.name %></span>
+        </div>
+        <div class="info-box">
+          <strong>Employee Email</strong>
+          <span><%= emp.email %></span>
+        </div>
+        <div class="info-box">
+          <strong>Phone</strong>
+          <span><%= emp.phone || 'Not provided' %></span>
+        </div>
+        <div class="info-box">
+          <strong>Department</strong>
+          <span><%= emp.dept %></span>
+        </div>
+        <div class="info-box">
+          <strong>Joining Date</strong>
+          <span><%= new Date(emp.date).toLocaleDateString('en-IN') %></span>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 22px; display: grid; gap: 12px;">
+        <% if (whatsappLink) { %>
+          <a href="<%= whatsappLink %>" target="_blank" rel="noopener noreferrer" class="footer-link">Open WhatsApp to send payroll receipt</a>
+          <div style="color: #6b7280; font-size: 14px;">This opens WhatsApp with the payroll message prefilled for <strong><%= emp.phone %></strong>. Tap Send in WhatsApp to share it.</div>
+        <% } else { %>
+          <div style="padding: 18px 20px; border-radius: 16px; background: #fff7ed; border: 1px solid #f5deb3; color: #92400e;">
+            No WhatsApp number available for this employee. Please edit the employee and add a phone number to send via WhatsApp.
+          </div>
+        <% } %>
+      </div>
+
+      <table class="salary-table">
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th>Amount (₹)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Basic Salary</td>
+            <td><%= basic.toLocaleString('en-IN') %></td>
+          </tr>
+          <tr>
+            <td>House Rent Allowance (HRA)</td>
+            <td><%= hra.toLocaleString('en-IN') %></td>
+          </tr>
+          <tr>
+            <td>Dearness Allowance (DA)</td>
+            <td><%= da.toLocaleString('en-IN') %></td>
+          </tr>
+          <tr>
+            <td>Gross Salary</td>
+            <td><%= gross.toLocaleString('en-IN') %></td>
+          </tr>
+          <tr>
+            <td>Provident Fund (PF)</td>
+            <td><%= pf.toLocaleString('en-IN') %></td>
+          </tr>
+          <tr class="total-row">
+            <td>Net Salary</td>
+            <td><%= netSalary.toLocaleString('en-IN') %></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <a href="/employees" class="footer-link">← Back to Employees</a>
+    </div>
+  </div>
+</body>
+</html>
