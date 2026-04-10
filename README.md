@@ -9,7 +9,7 @@ A Node/Express payroll application with EJS views and MongoDB persistence.
 Use Render, Railway, or Heroku. The app already includes a `Procfile` so it can run on Heroku-like platforms.
 
 Required environment variables:
-- `MONGODB_URI` — your MongoDB connection string
+- `MONGODB_URI`, `DATABASE_URL`, `MONGO_URI`, or `MONGO_URL` — your MongoDB connection string
 - `PORT` — optional, defaults to `3000`
 
 #### Render / Heroku steps
