@@ -15,5 +15,6 @@ router.put("/:id", controller.updateEmployee);
 router.delete("/:id", controller.deleteEmployee);
 
 router.get("/payroll/:id", controller.getPayroll);
+router.post("/payroll/:id/email", controller.sendPayrollEmail);
 
 export default router;

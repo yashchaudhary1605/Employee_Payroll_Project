@@ -1,3 +1,4 @@
+import nodemailer from "nodemailer";
 import Employee from "../Models/Employee.js";
 
 const calculateSalary = (basic) => {
@@ -77,15 +78,49 @@ const buildReceiptHtml = (emp, netSalary) => {
 </html>`;
 };
 
-const normalizeWhatsappPhone = (phone) => {
-  const digits = String(phone || "").replace(/[^0-9]/g, "");
-  if (digits.length === 10) {
-    return `91${digits}`;
+const createMailTransporter = () => {
+  const host = process.env.SMTP_HOST;
+  const port = Number(process.env.SMTP_PORT || 587);
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASS;
+  const secure = process.env.SMTP_SECURE === "true";
+
+  if (!host || !user || !pass) {
+    throw new Error(
+      "SMTP configuration is missing. Set SMTP_HOST, SMTP_PORT, SMTP_USER, and SMTP_PASS in .env."
+    );
   }
-  if (digits.length === 11 && digits.startsWith("0")) {
-    return `91${digits.slice(1)}`;
-  }
-  return digits;
+
+  return nodemailer.createTransport({
+    host,
+    port,
+    secure,
+    auth: { user, pass },
+  });
+};
+
+const buildPayrollText = (emp, netSalary) => {
+  const basic = Number(emp.basic_sal);
+  const hra = Math.round(basic * 0.2);
+  const da = Math.round(basic * 0.1);
+  const pf = Math.round(basic * 0.05);
+  const gross = basic + hra + da;
+
+  return `Payroll Receipt for ${emp.name}
+Employee ID: ${emp.id}
+Department: ${emp.dept}
+Email: ${emp.email}
+Phone: ${emp.phone || "Not provided"}
+
+Salary Breakdown (₹):
+Basic Salary: ${basic.toLocaleString('en-IN')}
+HRA: ${hra.toLocaleString('en-IN')}
+DA: ${da.toLocaleString('en-IN')}
+PF: ${pf.toLocaleString('en-IN')}
+Gross Salary: ${gross.toLocaleString('en-IN')}
+Net Salary: ${netSalary.toLocaleString('en-IN')}
+
+Thank you for using Employee Payroll.`;
 };
 
 export const getEmployees = async (req, res) => {
@@ -173,20 +208,47 @@ export const deleteEmployee = async (req, res) => {
   }
 };
 
-const buildWhatsappMessage = (emp, netSalary) => {
-  const basic = Number(emp.basic_sal);
-  const hra = Math.round(basic * 0.2);
-  const da = Math.round(basic * 0.1);
-  const pf = Math.round(basic * 0.05);
-  const gross = basic + hra + da;
+export const sendPayrollEmail = async (req, res) => {
+  try {
+    const emp = await Employee.findById(req.params.id);
 
-  return `Payroll Receipt for ${emp.name}\nEmployee ID: ${emp.id}\nDepartment: ${emp.dept}\nEmail: ${emp.email}\n\nSalary Breakdown (₹):\nBasic Salary: ${basic.toLocaleString('en-IN')}\nHRA: ${hra.toLocaleString('en-IN')}\nDA: ${da.toLocaleString('en-IN')}\nPF: ${pf.toLocaleString('en-IN')}\nGross Salary: ${gross.toLocaleString('en-IN')}\nNet Salary: ${netSalary.toLocaleString('en-IN')}\n\nThank you for using Employee Payroll.`;
-};
+    if (!emp) {
+      return res.send("Employee not found");
+    }
 
-const buildWhatsappLink = (phone, message) => {
-  const digits = normalizeWhatsappPhone(phone);
-  if (!digits) return null;
-  return `https://wa.me/${digits}?text=${encodeURIComponent(message)}`;
+    if (!emp.email) {
+      return res.redirect(
+        `/employees/payroll/${req.params.id}?status=error&message=${encodeURIComponent(
+          "Employee has no email address configured. Please add one before sending."
+        )}`,
+      );
+    }
+
+    const netSalary = calculateSalary(emp.basic_sal);
+    const transporter = createMailTransporter();
+    const mailOptions = {
+      from: process.env.EMAIL_FROM || process.env.SMTP_USER,
+      to: emp.email,
+      subject: `Payroll Receipt for ${emp.name}`,
+      text: buildPayrollText(emp, netSalary),
+      html: buildReceiptHtml(emp, netSalary),
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    res.redirect(
+      `/employees/payroll/${req.params.id}?status=success&message=${encodeURIComponent(
+        "Payroll email sent successfully."
+      )}`,
+    );
+  } catch (err) {
+    console.error("Payroll email error:", err);
+    res.redirect(
+      `/employees/payroll/${req.params.id}?status=error&message=${encodeURIComponent(
+        "Failed to send payroll email: " + err.message
+      )}`,
+    );
+  }
 };
 
 export const getPayroll = async (req, res) => {
@@ -198,11 +260,10 @@ export const getPayroll = async (req, res) => {
     }
 
     const netSalary = calculateSalary(emp.basic_sal);
-    const whatsappLink = emp.phone ? buildWhatsappLink(emp.phone, buildWhatsappMessage(emp, netSalary)) : null;
     const status = req.query.status;
     const message = req.query.message || null;
 
-    res.render("payroll", { emp, netSalary, status, message, whatsappLink });
+    res.render("payroll", { emp, netSalary, status, message });
   } catch (err) {
     res.send("Error fetching payroll: " + err.message);
   }

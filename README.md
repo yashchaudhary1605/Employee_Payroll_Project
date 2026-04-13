@@ -9,7 +9,7 @@ A Node/Express payroll application with EJS views and MongoDB persistence.
 Use Render, Railway, or Heroku. The app already includes a `Procfile` so it can run on Heroku-like platforms.
 
 Required environment variables:
-- `MONGODB_URI`, `DATABASE_URL`, `MONGO_URI`, or `MONGO_URL` — your MongoDB connection string
+- `MONGODB_URI`, `MONGO_URI`, `MONGO_URL`, `DATABASE_URL`, `RAILWAY_MONGODB_URI`, or `RAILWAY_MONGO_URL` — your MongoDB connection string
 - `PORT` — optional, defaults to `3000`
 
 #### Render / Heroku steps
@@ -38,5 +38,6 @@ If you do not already have MongoDB hosted, use MongoDB Atlas:
 
 ## Notes
 
-- The app opens WhatsApp directly on the device using a WhatsApp link.
-- No WhatsApp Cloud API credentials are required; the message opens in WhatsApp for the user to send manually.
+- The app now sends payroll receipts by email with Nodemailer.
+- Required SMTP environment variables: `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, and optionally `SMTP_SECURE` and `EMAIL_FROM`.
+- If `EMAIL_FROM` is not set, the sender defaults to `SMTP_USER`.

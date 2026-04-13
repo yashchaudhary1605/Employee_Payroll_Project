@@ -184,13 +184,21 @@
         </div>
       </div>
 
+      <% if (message) { %>
+        <div style="margin-bottom: 22px; padding: 18px 20px; border-radius: 16px; background: <%= status === 'error' ? '#fee2e2' : '#ecfdf5' %>; border: 1px solid <%= status === 'error' ? '#fecaca' : '#a7f3d0' %>; color: <%= status === 'error' ? '#b91c1c' : '#166534' %>;">
+          <%= message %>
+        </div>
+      <% } %>
+
       <div style="margin-bottom: 22px; display: grid; gap: 12px;">
-        <% if (whatsappLink) { %>
-          <a href="<%= whatsappLink %>" target="_blank" rel="noopener noreferrer" class="footer-link">Open WhatsApp to send payroll receipt</a>
-          <div style="color: #6b7280; font-size: 14px;">This opens WhatsApp with the payroll message prefilled for <strong><%= emp.phone %></strong>. Tap Send in WhatsApp to share it.</div>
+        <% if (emp.email) { %>
+          <form action="/employees/payroll/<%= emp.id %>/email" method="POST">
+            <button type="submit" class="footer-link">Send payroll receipt by email</button>
+          </form>
+          <div style="color: #6b7280; font-size: 14px;">Payroll will be emailed to <strong><%= emp.email %></strong>.</div>
         <% } else { %>
           <div style="padding: 18px 20px; border-radius: 16px; background: #fff7ed; border: 1px solid #f5deb3; color: #92400e;">
-            No WhatsApp number available for this employee. Please edit the employee and add a phone number to send via WhatsApp.
+            No email address available for this employee. Please edit the employee and add an email to send via email.
           </div>
         <% } %>
       </div>
